@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:sqlserver://localhost:1433;encrypt=true;trustServerCertificate=true;databaseName=rest_handler
+    username: sa
+    password: admin123
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  jpa:
+    show-sql: true
+  mvc:
+    pathmatcher:
+      matching-strategy: ant_patch_matcher
+
+
+server:
+  port: 8081
+
