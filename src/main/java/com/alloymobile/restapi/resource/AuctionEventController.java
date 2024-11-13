@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auction-events")
+@CrossOrigin(origins= "http://localhost:4200")
 public class AuctionEventController {
 
     @Autowired
