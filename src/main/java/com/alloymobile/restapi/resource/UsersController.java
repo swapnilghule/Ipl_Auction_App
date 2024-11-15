@@ -3,6 +3,8 @@ package com.alloymobile.restapi.resource;
 import com.alloymobile.restapi.DTO.UsersDTO;
 import com.alloymobile.restapi.persistence.Users;
 import com.alloymobile.restapi.persistence.UsersRepository;
+import com.alloymobile.restapi.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,34 +18,37 @@ public class UsersController {
     @Autowired
     private UsersRepository usersRepository;
 
+    @Autowired
+    private UserService userService;
     @PostMapping("/register")
-    public UsersDTO registerUser(@RequestBody UsersDTO userDTO){
-        Users users = new Users();
-        users.setUsername(userDTO.getUsername());
-        users.setPassword(userDTO.getPassword());
-
-        Users savedUsers = usersRepository.save(users);
-
-        return new UsersDTO(savedUsers.getId(), savedUsers.getUsername());
+    public String registerUser(@RequestBody Users user){
+        userService.registerUser(user);
+        return "User registered Successfully";
     }
 
-    @GetMapping("/users")
-    public List<UsersDTO> getAllUsers(){
-        return usersRepository.findAll().stream().map(users ->
-                new UsersDTO(users.getId(), users.getUsername()))
-                .collect(Collectors.toList());
-    }
-
-    @GetMapping("/login")
-    public String login(@RequestParam String username, @RequestParam String password){
-        Users users = usersRepository.findByUsername(username);
-        if(users != null && users.getPassword().equals(password)){
-            return "Login successful for user:" +username;
+    @PostMapping("/login")
+    public String loginUser(@RequestParam String username, @RequestParam String password, HttpSession session){
+        var user = userService.loginUser(username, password);
+        if(user.isPresent()){
+            session.setAttribute("loggedInUser", user.get());
+            return "Login Successful";
         }
-        else{
-            return "Invalid Login ID";
-        }
+        return "Invalid UserName or Password";
     }
+
+    @GetMapping("/current")
+    public Users getCurrentUser(HttpSession session){
+        return (Users) session.getAttribute("loggedInUser");
+    }
+
+    @PostMapping("/logout")
+    public String logoutUser(HttpSession session){
+        session.invalidate();
+        return "Logout User Successfully";
+    }
+
+
+
 
 
 }

@@ -65,6 +65,27 @@ public class AuctionEventController {
         return ResponseEntity.ok(auctionEvents);
     }
 
+    @DeleteMapping("/{auctionId}")
+    public ResponseEntity<String> deleteAuctionEvent(@PathVariable Long auctionId){
+
+        if(auctionEventRepository.existsById(auctionId)){
+            auctionEventRepository.deleteById(auctionId);
+            return ResponseEntity.ok("Auction event deleted");
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Auction Event not found");
+
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<AuctionEvent> getAuctionEventById(@PathVariable Long auctionId){
+        return auctionEventRepository.findById(auctionId)
+                .map(auctionEvent -> ResponseEntity.ok().body(auctionEvent)).orElseGet(
+                        () -> ResponseEntity.ok().body(null));
+    }
+
+
 
 
 
