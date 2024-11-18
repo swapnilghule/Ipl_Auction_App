@@ -1,9 +1,11 @@
 package com.alloymobile.restapi.persistence;
 
 
+import com.alloymobile.restapi.enums.AuctionStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,10 +15,14 @@ public class AuctionEvent {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long auctionId;
-    private String eventName;
+    private String auctionName;
     private int teamLimit;
     private double prizePool;
-    private LocalDateTime startTime;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
+    @Enumerated(EnumType.STRING)
+    private AuctionStatus status = AuctionStatus.PENDING;
+
 
 
     @ManyToOne
@@ -24,13 +30,6 @@ public class AuctionEvent {
     private Users userId;
     public AuctionEvent(){}
 
-    public AuctionEvent(Long auctionId, String eventName, int teamLimit, double prizePool, LocalDateTime startTime, Users userId) {
-        this.auctionId = auctionId;
-        this.eventName = eventName;
-        this.teamLimit = teamLimit;
-        this.prizePool = prizePool;
-        this.startTime = startTime;
-        this.userId = userId;
-    }
+
 
 }

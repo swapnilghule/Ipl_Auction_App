@@ -3,12 +3,16 @@ package com.alloymobile.restapi.resource;
 import com.alloymobile.restapi.DTO.UsersDTO;
 import com.alloymobile.restapi.persistence.Users;
 import com.alloymobile.restapi.persistence.UsersRepository;
+//import com.alloymobile.restapi.security.JwtUtil;
 import com.alloymobile.restapi.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -19,34 +23,60 @@ public class UsersController {
     private UsersRepository usersRepository;
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+
+//    @Autowired
+//    private JwtUtil jwtUtil;
+
+    @Autowired
     private UserService userService;
+
+
     @PostMapping("/register")
     public String registerUser(@RequestBody Users user){
-        userService.registerUser(user);
+        System.out.println("Insdie reg Service");
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        usersRepository.save(user);
         return "User registered Successfully";
     }
 
-    @PostMapping("/login")
-    public String loginUser(@RequestParam String username, @RequestParam String password, HttpSession session){
-        var user = userService.loginUser(username, password);
-        if(user.isPresent()){
-            session.setAttribute("loggedInUser", user.get());
-            return "Login Successful";
+
+
+    @PostMapping("/login-api")
+    public String loginUserx(@RequestParam String email, @RequestParam String password){
+
+        return userService.loginUser(email, password);
+    }
+
+    @GetMapping("/test-api")
+    public String getResult(@RequestParam String username){
+        Users user= usersRepository.findByUsername(username);
+
+        if(username != null)
+        {
+            return username;
         }
-        return "Invalid UserName or Password";
+        else{
+            return "FAILURE";
+        }
     }
 
-    @GetMapping("/current")
-    public Users getCurrentUser(HttpSession session){
-        return (Users) session.getAttribute("loggedInUser");
-    }
-
-    @PostMapping("/logout")
-    public String logoutUser(HttpSession session){
-        session.invalidate();
-        return "Logout User Successfully";
-    }
-
+//    @PostMapping("/login")
+//    public Map<String, String> loginUser(@RequestBody UsersDTO user){
+//        Users users= usersRepository.findByUsername(user.getUsername())
+//                .orElseThrow(() -> new RuntimeException("User Not found"));
+//
+//        if(!passwordEncoder.matches(user.getPassword(), users.getPassword())){
+//            throw new RuntimeException("Invalid crendentils");
+//        }
+//
+//        String token = jwtUtil.generateToken(users.getUsername());
+//        Map<String, String> response= new HashMap<>();
+//        response.put("token", token);
+//        return response;
+//
+//    }
 
 
 

@@ -1,13 +1,18 @@
 package com.alloymobile.restapi.resource;
 
 import com.alloymobile.restapi.DTO.AuctionEventDTO;
+import com.alloymobile.restapi.DTO.AuctionEventRequest;
 import com.alloymobile.restapi.persistence.AuctionEvent;
 import com.alloymobile.restapi.persistence.AuctionEventRepository;
 import com.alloymobile.restapi.persistence.Users;
 import com.alloymobile.restapi.persistence.UsersRepository;
+import com.alloymobile.restapi.service.AuctionEventService;
+import com.sun.jdi.connect.LaunchingConnector;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,76 +23,42 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/auction-events")
 @CrossOrigin(origins= "http://localhost:4200")
 public class AuctionEventController {
-
     @Autowired
     private AuctionEventRepository auctionEventRepository;
+    @Autowired
+    private AuctionEventService eventService;
 
     @Autowired
     private UsersRepository usersRepository;
 
-    @PostMapping("/create")
-    public ResponseEntity<String> createAuctionEvent(@RequestBody AuctionEventDTO auctionEventDTO){
-        Optional<Users> userOpt= usersRepository.findById(auctionEventDTO.getUserId());
-        if(userOpt.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
 
-        Users user = userOpt.get();
-        AuctionEvent auctionEvent = new AuctionEvent();
-        auctionEvent.setEventName(auctionEventDTO.getEventName());
-        auctionEvent.setTeamLimit(auctionEventDTO.getTeamLimit());
-        auctionEvent.setPrizePool(auctionEventDTO.getPrizePool());
-        auctionEvent.setStartTime(auctionEventDTO.getStartTime());
-        auctionEvent.setUserId(user);
-
-        auctionEventRepository.save(auctionEvent);
-        return  ResponseEntity.status(HttpStatus.CREATED).body("Event Has been created");
-
-    }
-
-
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<AuctionEvent>> getAuctionEventbyId(@PathVariable Long userId)
-    {
-        Optional<Users> userOpt = usersRepository.findById(userId);
-
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-
-        List<AuctionEvent> auctionEvents = auctionEventRepository.findByUserId(userOpt.get());
-        return ResponseEntity.ok(auctionEvents);
-    }
-
+//    public JwtUtil jwtUtil;
+////    @PostMapping("/create")
+////    public String createAuction(@RequestBody AuctionEvent auctionEvent, @RequestHeader("Authorization") String token){
+////        String username = jwtUtil.extarctUsername(token.substring(7));
+////        Users users= usersRepository.findByUsername(username)
+////                .orElseThrow(() -> new RuntimeException("User Not Found"));
+////
+////
+////        if(!users.getCreatedBy().equals("ADMIN")){
+////            throw new RuntimeException("Unauthorised user");
+////        }
+////
+////        auctionEventRepository.save(auctionEvent);
+////        return "Auction created successfully";
+////
+////    }
+//
     @GetMapping("/all")
-    public ResponseEntity<List<AuctionEvent>> getAllauctionDetails() {
-        List<AuctionEvent> auctionEvents= auctionEventRepository.findAll();
-        return ResponseEntity.ok(auctionEvents);
+    public String getAllAuction(){
+        return "SUCCESS";
     }
 
-    @DeleteMapping("/{auctionId}")
-    public ResponseEntity<String> deleteAuctionEvent(@PathVariable Long auctionId){
-
-        if(auctionEventRepository.existsById(auctionId)){
-            auctionEventRepository.deleteById(auctionId);
-            return ResponseEntity.ok("Auction event deleted");
-        }
-        else{
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Auction Event not found");
-
-        }
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<AuctionEvent> getAuctionEventById(@PathVariable Long auctionId){
-        return auctionEventRepository.findById(auctionId)
-                .map(auctionEvent -> ResponseEntity.ok().body(auctionEvent)).orElseGet(
-                        () -> ResponseEntity.ok().body(null));
-    }
-
-
-
-
+//    public List<AuctionEvent> getUserAuction( @RequestHeader("Authorization") String token){
+//         String username= jwtUtil.extarctUsername(token.substring(7));
+//         return auctionEventRepository.findBy(username);
+//    }
+//
 
 
 }

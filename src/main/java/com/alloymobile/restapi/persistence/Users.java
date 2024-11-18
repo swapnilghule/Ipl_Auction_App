@@ -23,7 +23,9 @@ public class Users {
     @Email
     @NotBlank
     private String email;
-    private String createdBy;
+
+    @Enumerated(EnumType.STRING)
+    private CreatedBy createdBy;
 
 
     public Users(){
@@ -34,5 +36,10 @@ public class Users {
         this.userId = userId;
         this.username = username;
         this.password = password;
+    }
+
+    public enum CreatedBy{
+        USER,
+        ADMIN
     }
 }
